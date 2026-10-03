@@ -1,0 +1,791 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Supercraft | Loja Oficial</title>
+
+<style>
+:root {
+  --green:#4caf50;
+  --dark-green:#214c2b;
+  --brown:#765036;
+  --cream:#f5f1e6;
+}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:var(--cream);
+  color:#20251f;
+}
+
+header{
+  background:var(--dark-green);
+  color:white;
+  padding:18px 7%;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:15px;
+}
+
+.logo{font-size:27px;font-weight:900}
+.logo span{color:#9ee66d}
+
+nav{display:flex;gap:20px}
+nav a{color:white;text-decoration:none;font-weight:bold}
+
+button{cursor:pointer}
+
+.cart-button{
+  background:var(--green);
+  color:white;
+  border:0;
+  padding:12px 18px;
+  border-radius:7px;
+  font-weight:bold;
+}
+
+.hero{
+  min-height:420px;
+  padding:65px 8%;
+  display:flex;
+  align-items:center;
+  color:white;
+  background:
+    linear-gradient(90deg,#142817ed,#14281755),
+    url("https://images.unsplash.com/photo-1587654780291-39c9404d746b?auto=format&fit=crop&w=1600&q=85")
+    center/cover;
+}
+
+.hero-content{max-width:580px}
+.hero h1{font-size:clamp(40px,6vw,65px);line-height:1.05}
+.hero p{font-size:18px;line-height:1.6}
+
+.hero button{
+  background:#8bd35d;
+  color:#17341c;
+  border:0;
+  padding:15px 24px;
+  border-radius:5px;
+  font-weight:bold;
+}
+
+section{padding:55px 7%}
+.section-title{text-align:center;font-size:32px}
+.section-subtitle{text-align:center;color:#777;margin-bottom:35px}
+
+.categories{
+  display:flex;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:12px;
+  margin-bottom:35px;
+}
+
+.categories button{
+  padding:11px 20px;
+  border:2px solid var(--dark-green);
+  background:transparent;
+  border-radius:6px;
+  font-weight:bold;
+}
+
+.categories button.active{
+  background:var(--dark-green);
+  color:white;
+}
+
+.products{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:25px;
+}
+
+.product{
+  background:white;
+  border-radius:12px;
+  overflow:hidden;
+  box-shadow:0 5px 18px #00000012;
+  transition:.2s;
+}
+
+.product:hover{transform:translateY(-5px)}
+
+.product img{
+  width:100%;
+  height:230px;
+  object-fit:cover;
+  background:#e5e1d5;
+  cursor:pointer;
+}
+
+.product-info{padding:18px}
+.product-info h3{margin:0 0 8px}
+.description{font-size:13px;color:#777;min-height:32px}
+
+.price{
+  font-size:23px;
+  color:var(--dark-green);
+  font-weight:900;
+  margin:15px 0;
+}
+
+.add{
+  width:100%;
+  padding:13px;
+  background:var(--dark-green);
+  color:white;
+  border:0;
+  border-radius:6px;
+  font-weight:bold;
+}
+
+.details-button{
+  width:100%;
+  padding:12px;
+  background:white;
+  color:var(--dark-green);
+  border:1px solid var(--dark-green);
+  border-radius:6px;
+  margin-top:9px;
+  font-weight:bold;
+}
+
+.banner{
+  background:var(--brown);
+  color:white;
+  text-align:center;
+  padding:45px 20px;
+}
+
+footer{
+  background:#192b1d;
+  color:white;
+  text-align:center;
+  padding:35px 7%;
+}
+
+/* CARRINHO */
+
+.overlay{
+  position:fixed;
+  inset:0;
+  background:#0009;
+  z-index:10;
+  display:none;
+}
+
+.overlay.show{display:block}
+
+.cart{
+  position:fixed;
+  z-index:11;
+  top:0;
+  right:-420px;
+  width:min(400px,100%);
+  height:100%;
+  background:white;
+  padding:24px;
+  transition:.3s;
+  display:flex;
+  flex-direction:column;
+}
+
+.cart.open{right:0}
+
+.cart-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.close{
+  border:0;
+  background:none;
+  font-size:28px;
+}
+
+.cart-items{flex:1;overflow-y:auto;margin:20px 0}
+
+.cart-item{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  padding:15px 0;
+  border-bottom:1px solid #ddd;
+}
+
+.quantity{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-top:8px;
+}
+
+.quantity button{
+  width:27px;
+  height:27px;
+  border:0;
+  background:#e8eee6;
+  border-radius:5px;
+}
+
+.remove{
+  color:#b22;
+  background:none;
+  border:0;
+}
+
+.total{font-size:22px;font-weight:bold;margin-bottom:15px}
+
+.checkout{
+  background:#25d366;
+  color:white;
+  border:0;
+  padding:16px;
+  border-radius:7px;
+  font-weight:bold;
+}
+
+/* JANELA DE DETALHES */
+
+.modal{
+  display:none;
+  position:fixed;
+  z-index:20;
+  inset:0;
+  background:#000b;
+  justify-content:center;
+  align-items:center;
+  padding:15px;
+}
+
+.modal.show{display:flex}
+
+.modal-content{
+  background:white;
+  width:min(750px,100%);
+  max-height:90vh;
+  overflow:auto;
+  border-radius:14px;
+  position:relative;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+}
+
+.modal-content img{
+  width:100%;
+  height:100%;
+  min-height:350px;
+  object-fit:cover;
+  background:#e5e1d5;
+}
+
+.modal-info{padding:30px}
+
+.modal-info h2{font-size:27px}
+
+.modal-info p{line-height:1.6;color:#666}
+
+.modal-price{
+  font-size:28px;
+  color:var(--dark-green);
+  font-weight:900;
+  margin:20px 0;
+}
+
+.modal-close{
+  position:absolute;
+  right:12px;
+  top:10px;
+  border:0;
+  background:white;
+  border-radius:50%;
+  width:35px;
+  height:35px;
+  font-size:23px;
+  z-index:2;
+}
+
+.qty-input{
+  width:70px;
+  padding:10px;
+  margin-bottom:15px;
+}
+
+@media(max-width:600px){
+  header{justify-content:center}
+  nav{width:100%;justify-content:center}
+  .hero{min-height:350px}
+  section{padding:40px 5%}
+  .modal-content{grid-template-columns:1fr}
+  .modal-content img{height:250px;min-height:250px}
+  .modal-info{padding:22px}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">⛏ SUPER<span>CRAFT</span></div>
+
+  <nav>
+    <a href="#inicio">Início</a>
+    <a href="#produtos">Produtos</a>
+    <a href="#sobre">Sobre</a>
+  </nav>
+
+  <button class="cart-button" onclick="openCart()">
+    🛒 Carrinho (<span id="count">0</span>)
+  </button>
+</header>
+
+<div class="hero" id="inicio">
+  <div class="hero-content">
+    <h1>SEU MUNDO.<br>SUAS CRIAÇÕES.</h1>
+    <p>Bonecos, animais e colecionáveis feitos para transformar sua paixão por Minecraft em realidade.</p>
+    <button onclick="document.getElementById('produtos').scrollIntoView({behavior:'smooth'})">
+      EXPLORAR PRODUTOS
+    </button>
+  </div>
+</div>
+
+<section id="produtos">
+  <h2 class="section-title">NOSSA LOJA</h2>
+  <p class="section-subtitle">Escolha seu próximo item de coleção!</p>
+
+  <div class="categories">
+    <button class="active" onclick="filterProducts('Todos',this)">Todos</button>
+    <button onclick="filterProducts('Bonecos',this)">Bonecos</button>
+    <button onclick="filterProducts('Animais',this)">Animais</button>
+    <button onclick="filterProducts('Blocos',this)">Blocos</button>
+    <button onclick="filterProducts('Limitados',this)">Limitados</button>
+  </div>
+
+  <div class="products" id="products"></div>
+</section>
+
+<div class="banner" id="sobre">
+  <h2>⛏ FEITO PARA QUEM AMA CRIAR</h2>
+  <p>Peças produzidas em impressão 3D, com criatividade em cada detalhe.</p>
+</div>
+
+<footer>
+  <div class="logo">SUPER<span>CRAFT</span></div>
+  <p>Construa sua coleção, um bloco de cada vez.</p>
+  <p>© 2026 Supercraft. Todos os direitos reservados.</p>
+</footer>
+
+<div class="overlay" id="overlay" onclick="closeCart()"></div>
+
+<aside class="cart" id="cart">
+  <div class="cart-header">
+    <h2>Seu carrinho 🛒</h2>
+    <button class="close" onclick="closeCart()">×</button>
+  </div>
+
+  <div class="cart-items" id="cartItems"></div>
+
+  <div class="total">Total: R$ <span id="total">0,00</span></div>
+
+  <button class="checkout" onclick="checkout()">
+    Finalizar pedido pelo WhatsApp
+  </button>
+</aside>
+
+<div class="modal" id="modal" onclick="closeDetails(event)">
+  <div class="modal-content" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="closeDetails()">×</button>
+    <img id="detailImage" src="" alt="Produto">
+    <div class="modal-info">
+      <h2 id="detailName"></h2>
+      <p id="detailDescription"></p>
+      <p><strong>Material:</strong> PLA — impressão 3D</p>
+      <p><strong>Tamanho:</strong> Consulte as dimensões disponíveis.</p>
+      <div class="modal-price" id="detailPrice"></div>
+      <label for="detailQuantity">Quantidade:</label><br>
+      <input class="qty-input" id="detailQuantity" type="number" min="1" max="99" value="1">
+      <button class="add" onclick="addDetailToCart()">ADICIONAR AO CARRINHO</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const products = [
+  {
+    id:1,
+    name:"Creeper Clássico",
+    category:"Bonecos",
+    price:39.90,
+    description:"O clássico explosivo da coleção. Ideal para decorar sua mesa ou completar sua coleção.",
+    image:"imagens/creeper.jpg.jpeg"
+  },
+  {
+    id:2,
+    name:"Raposa Pixel",
+    category:"Animais",
+    price:29.90,
+    description:"Uma companheira para sua coleção, produzida em impressão 3D.",
+    image:"imagens/raposa.jpg.jpeg"
+  },
+  {
+    id:3,
+    name:"Tartaruga",
+    category:"Animais",
+    price:19.90,
+    description:"Um animal tranquilo que vive próximo às praias e oceanos do Minecraft.",
+    image:"imagens/tartaruga.jpg.jpeg"
+  },
+  {
+    id:4,
+    name:"Steve Explorador",
+    category:"Bonecos",
+    price:44.90,
+    description:"Personagem clássico para acompanhar suas aventuras.",
+    image:"imagens/stev.jpg.jpeg"
+  },
+  {
+    id:5,
+    name:"Enderman edição CRISTAL",
+    category:"Limitados",
+    price:69.90,
+    description:"Edição Limitada: Uma versão especial do Enderman, com detalhes cristalinos brilhantes que dão ao boneco um visual raro e misterioso.",
+    image:"imagens/enderman.jpg.png"
+  },
+  {
+    id:6,
+    name:"Lobo Companheiro",
+    category:"Animais",
+    price:34.90,
+    description:"Um amigo para sua coleção de criaturas.",
+    image:"imagens/lobo.jpg.jpeg"
+  },
+  {
+   id:7,
+    name:"Abelha",
+    category:"Animais",
+    price:25.90,
+    description:"Uma pequena criatura voadora que coleta néctar e ajuda a polinizar as flores..",
+    image:"imagens/abelha.jpg.jpeg"
+ },
+  {
+   id:8,
+    name:"Porco",
+    category:"Animais",
+    price:25.90,
+    description:"Um simpático animal do Minecraft que pode ser encontrado explorando os campos.",
+    image:"imagens/porco.jpg.jpeg"
+ },
+  {
+   id:9,
+    name:"Steve de OURO",
+    category:"Limitados",
+    price:69.90,
+    description:"Edição Limitada: Um guerreiro exclusivo revestido em uma armadura dourada reluzente, criado para se destacar em qualquer coleção.",
+    image:"imagens/steav.jpg.png"
+ },
+  {
+   id:10,
+    name:"Whiter skeleton edição HALLOWEEN",
+    category:"Limitados",
+    price:69.90,
+    description:"Edição Limitada: um guerreiro de Halloween em estilo Minecraft, com espada mágica brilhante e visual épico.",
+    image:"imagens/abobora.jpg.jpeg"
+ },
+  {
+   id:11,
+    name:"Alex",
+    category:"Bonecos",
+    price:44.90,
+    description:"uma aventureira clássica em blocos, equipada com seu arco para novas aventuras.",
+    image:"imagens/eva.jpg.jpeg"
+ },
+  {
+   id:12,
+    name:"Esqueleto",
+    category:"Bonecos",
+    price:44.90,
+    description:"um guerreiro de ossos em blocos, equipado com seu arco para enfrentar qualquer aventura.",
+    image:"imagens/esqueleto.jpg.jpeg"
+ },
+  {
+   id:13,
+    name:"Enderman",
+    category:"Bonecos",
+    price:44.90,
+    description:"um misterioso personagem em blocos segurando um clássico bloco de grama.",
+    image:"imagens/ender.jpg.jpeg."
+ },
+  {
+   id:14,
+    name:"Mesa de Trabalho",
+    category:"Blocos",
+    price:14.90,
+    description:"um bloco clássico para criar e combinar itens em novas aventuras.",
+    image:"imagens/mesa.jpg.jpeg."
+ },
+  {
+   id:15,
+    name:"Fornalha",
+    category:"Blocos",
+    price:14.90,
+    description:"um bloco essencial para fundir minérios e preparar diversos itens.",
+    image:"imagens/fornalha.jpg.jpeg."
+ },
+  {
+   id:16,
+    name:"Baú",
+    category:"Blocos",
+    price:14.90,
+    description:"um bloco clássico para guardar itens e organizar seus recursos.",
+    image:"imagens/bau.jpg.jpeg."
+ },
+  {
+   id:17,
+    name:"Bloco de minerio de ferro",
+    category:"Blocos",
+    price:14.90,
+    description:"um bloco icônico para minerar recursos e iniciar grandes construções.",
+    image:"imagens/ferro.jpg.jpeg."
+  },
+  {
+   id:18,
+    name:"Bloco de grama",
+    category:"Blocos",
+    price:14.90,
+    description:"um clássico bloco natural para decorar e construir seu mundo.",
+    image:"imagens/grama.jpg.jpeg."
+  },
+  {
+   id:19,
+    name:"Bloco de TNT",
+    category:"Blocos",
+    price:14.90,
+    description:"um bloco explosivo clássico para causar destruição e transformar suas construções.",
+    image:"imagens/tnt.jpg.jpeg."
+  },
+  {
+   id:20,
+    name:"Baú do ender",
+    category:"Blocos",
+    price:14.90,
+    description:"um baú mágico para armazenar e acessar seus itens de qualquer lugar do mundo.",
+    image:"imagens/bauender.jpg.jpeg."
+   },
+  {
+   id:21,
+    name:"Pedra luminosa",
+    category:"Blocos",
+    price:14.90,
+    description:"um bloco brilhante que ilumina o ambiente e dá um toque mágico às construções.",
+    image:"imagens/glow.jpg.jpeg."
+    },
+  {
+   id:22,
+    name:"Redstone",
+    category:"Blocos",
+    price:14.90,
+    description:"um bloco cheio de energia, perfeito para criar mecanismos e circuitos.",
+    image:"imagens/red.jpg.jpeg."
+ 
+  
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+ 
+ 
+ 
+ 
+  },
+]; 
+let cart=[];
+let selectedProduct=null;
+
+const money=value=>value.toLocaleString("pt-BR",{
+  minimumFractionDigits:2,
+  maximumFractionDigits:2
+});
+
+function renderProducts(category="Todos"){
+  const filtered=category==="Todos"
+    ?products
+    :products.filter(p=>p.category===category);
+
+  document.getElementById("products").innerHTML=filtered.map(p=>`
+    <article class="product">
+      <img src="${p.image}" alt="${p.name}"
+        onclick="showDetails(${p.id})"
+        onerror="this.style.opacity='.25'">
+
+      <div class="product-info">
+        <h3>${p.name}</h3>
+        <p class="description">${p.description}</p>
+        <div class="price">R$ ${money(p.price)}</div>
+
+        <button class="add" onclick="addToCart(${p.id})">
+          🛒 ADICIONAR AO CARRINHO
+        </button>
+
+        <button class="details-button" onclick="showDetails(${p.id})">
+          VER DETALHES
+        </button>
+      </div>
+    </article>
+  `).join("");
+}
+
+function filterProducts(category,button){
+  document.querySelectorAll(".categories button")
+    .forEach(b=>b.classList.remove("active"));
+
+  button.classList.add("active");
+  renderProducts(category);
+}
+
+function showDetails(id){
+  selectedProduct=products.find(p=>p.id===id);
+
+  document.getElementById("detailImage").src=selectedProduct.image;
+  document.getElementById("detailName").textContent=selectedProduct.name;
+  document.getElementById("detailDescription").textContent=selectedProduct.description;
+  document.getElementById("detailPrice").textContent="R$ "+money(selectedProduct.price);
+  document.getElementById("detailQuantity").value=1;
+
+  document.getElementById("modal").classList.add("show");
+}
+
+function closeDetails(event){
+  if(event && event.target!==document.getElementById("modal"))return;
+  document.getElementById("modal").classList.remove("show");
+}
+
+function addDetailToCart(){
+  const quantity=Math.max(1,Math.min(99,
+    parseInt(document.getElementById("detailQuantity").value)||1
+  ));
+
+  addToCart(selectedProduct.id,quantity);
+  closeDetails();
+  openCart();
+}
+
+function addToCart(id,quantity=1){
+  const product=products.find(p=>p.id===id);
+  const item=cart.find(p=>p.id===id);
+
+  if(item){
+    item.quantity+=quantity;
+  }else{
+    cart.push({...product,quantity});
+  }
+
+  updateCart();
+}
+
+function changeQuantity(id,amount){
+  const item=cart.find(p=>p.id===id);
+  if(!item)return;
+
+  item.quantity+=amount;
+
+  if(item.quantity<=0){
+    cart=cart.filter(p=>p.id!==id);
+  }
+
+  updateCart();
+}
+
+function removeFromCart(id){
+  cart=cart.filter(p=>p.id!==id);
+  updateCart();
+}
+
+function updateCart(){
+  document.getElementById("count").textContent=
+    cart.reduce((sum,p)=>sum+p.quantity,0);
+
+  document.getElementById("cartItems").innerHTML=
+    cart.length?cart.map(p=>`
+      <div class="cart-item">
+        <div>
+          <strong>${p.name}</strong><br>
+          R$ ${money(p.price*p.quantity)}
+
+          <div class="quantity">
+            <button onclick="changeQuantity(${p.id},-1)">−</button>
+            <span>${p.quantity}</span>
+            <button onclick="changeQuantity(${p.id},1)">+</button>
+          </div>
+        </div>
+
+        <button class="remove" onclick="removeFromCart(${p.id})">
+          Remover
+        </button>
+      </div>
+    `).join(""):"<p>Seu carrinho está vazio.</p>";
+
+  const total=cart.reduce((sum,p)=>sum+p.price*p.quantity,0);
+  document.getElementById("total").textContent=money(total);
+}
+
+function openCart(){
+  document.getElementById("cart").classList.add("open");
+  document.getElementById("overlay").classList.add("show");
+}
+
+function closeCart(){
+  document.getElementById("cart").classList.remove("open");
+  document.getElementById("overlay").classList.remove("show");
+}
+
+function checkout(){
+  if(!cart.length){
+    alert("Adicione algum produto ao carrinho!");
+    return;
+  }
+
+  // SUBSTITUA PELO WHATSAPP DA SUPERCRAFT
+  const whatsapp="5551999999999";
+
+  const items=cart.map(p=>
+    `${p.quantity}x ${p.name} - R$ ${money(p.price*p.quantity)}`
+  ).join("\n");
+
+  const total=cart.reduce((sum,p)=>sum+p.price*p.quantity,0);
+
+  const message=`Olá! Quero fazer um pedido na Supercraft:\n\n${items}\n\nTotal: R$ ${money(total)}\n\nComo posso finalizar a compra?`;
+
+  window.open(
+    `https://wa.me/${whatsapp}?text=${encodeURIComponent(message)}`,
+    "_blank"
+  );
+}
+
+renderProducts();
+updateCart();
+</script>
+
+</body>
+</html>
